@@ -1,6 +1,11 @@
 const int CONTROLLED_OUT = 2;
+const unsigned long ON_STATE_DURATION_MS_MAX = 3600000;
+
 byte parseState = 0;
 byte demandedState = 0; 
+
+bool outputIsOn = false; 
+unsigned long toggleTimestamp;  
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); 
@@ -9,17 +14,32 @@ void setup() {
 }
 
 void setOutputState(byte demandedState) {
+  toggleTimestamp = millis(); 
   if (demandedState == 1) {
     digitalWrite(CONTROLLED_OUT, HIGH);
     digitalWrite(LED_BUILTIN, HIGH);
+    outputIsOn = true; 
   }
   else {
     digitalWrite(CONTROLLED_OUT, LOW);
     digitalWrite(LED_BUILTIN, LOW);
+    outputIsOn = false; 
   }
 }
 
-void loop() {
+inline void switchOutputOff() {
+  setOutputState(0); 
+}
+
+inline unsigned long getCurrentStateDuration() {
+  return millis() - toggleTimestamp; 
+}
+
+void loop() {  
+  if (outputIsOn && (getCurrentStateDuration() > ON_STATE_DURATION_MS_MAX) ) 
+     switchOutputOff();
+
+  
   if (Serial.available()) {
     char c = Serial.read();
     switch(parseState) {
