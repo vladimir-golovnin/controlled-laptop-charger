@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+}
+
+group 'ru.vgolovnin'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation files("/usr/share/java/RXTXcomm-2.2pre2.jar")
+}
+
+test {
+    useJUnitPlatform()
+}
