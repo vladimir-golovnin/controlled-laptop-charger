@@ -1,6 +1,9 @@
 package ru.vgolovnin.laptop.charger;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.TimeUnit;
 
 class ChargerController implements Runnable {
@@ -10,12 +13,12 @@ class ChargerController implements Runnable {
     private static final int CHARGE_PERCENT_MAX = 83;
     private static final int CHARGE_PERCENT_MIN = 77;
 
+    private static final Logger log = LoggerFactory.getLogger(ChargerController.class);
+
     private final Battery battery;
 
-    public static void main(String[] args) throws Exception {
-        Thread contolThread = new Thread(new ChargerController(new Battery()));
-        contolThread.start();
-        contolThread.join();
+    public static void main(String[] args) {
+        new ChargerController(new Battery()).run();
     }
 
     ChargerController(Battery battery) {
@@ -25,10 +28,10 @@ class ChargerController implements Runnable {
     public void run() {
         for (; ; ) {
             try (Charger charger = Charger.init()) {
-                System.out.println("Charger is connected");
+                log.info("Charger is connected");
                 controlCharge(charger);
             } catch (ChargerControlException e) {
-                System.err.println(e.getMessage());
+                log.warn(e.getMessage());
                 sleep(CHARGER_REINIT_INTERVAL_MILLIS);
             }
         }
