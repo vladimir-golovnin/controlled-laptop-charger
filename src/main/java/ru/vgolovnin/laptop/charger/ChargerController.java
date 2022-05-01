@@ -17,6 +17,8 @@ class ChargerController implements Runnable {
 
     private final Battery battery;
 
+    private State state = State.INIT;
+
     public static void main(String[] args) {
         new ChargerController(new Battery()).run();
     }
@@ -28,10 +30,12 @@ class ChargerController implements Runnable {
     public void run() {
         for (; ; ) {
             try (Charger charger = Charger.init()) {
+                state = State.CONTROL;
                 log.info("Charger is connected");
                 controlCharge(charger);
             } catch (ChargerControlException e) {
-                log.warn(e.getMessage());
+                if (state != State.RECOVER) log.warn(e.getMessage());
+                state = State.RECOVER;
                 sleep(CHARGER_REINIT_INTERVAL_MILLIS);
             }
         }
@@ -54,6 +58,10 @@ class ChargerController implements Runnable {
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private enum State {
+        INIT, CONTROL, RECOVER
     }
 
 }
