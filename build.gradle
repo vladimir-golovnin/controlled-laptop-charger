@@ -12,9 +12,17 @@ repositories {
 dependencies {
     implementation files("/usr/share/java/RXTXcomm-2.2pre2.jar")
     implementation("ch.qos.logback:logback-classic:1.2.11")
-
 }
 
 test {
     useJUnitPlatform()
+}
+
+task buildFatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'ru.vgolovnin.laptop.charger.ChargerController'
+    }
+    archiveName('charger-controller.jar')
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
