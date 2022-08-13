@@ -1,0 +1,11 @@
+[Unit]
+Description=Laptop Battery Gentle Charger Service
+
+[Service]
+User=root
+WorkingDirectory=/usr/lib/charger/bin
+ExecStart=/usr/lib/charger/bin/run
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
